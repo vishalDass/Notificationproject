@@ -4,44 +4,38 @@ class DataInputPane extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fname: "hello",
-      lname: "world",
-      email: "fsd",
-      message: "asdfsa",
+      fname: null,
+      lname: null,
+      email: null,
+      message: null,
       isSeen: false,
       count: 0
     };
   }
 
   handleSubmit = async event => {
-    var postdata = JSON.stringify(this.state);
     event.preventDefault();
-    console.log("sent data", postdata);
+    if (
+      this.state.fname == null ||
+      this.state.lname == null ||
+      this.state.email == null ||
+      this.state.message == null
+    ) {
+      alert("please fill alll the fields");
+    } else {
+      var postdata = JSON.stringify(this.state);
 
-    const res = await fetch(`http://localhost/index.php?data=${postdata}`, {
-      headers: {
-        Accept: "application/json",
-        method: "GET"
-      }
-    });
+      console.log("sent data", postdata);
 
-    const res1 = await fetch("http://localhost/fetch.php", {
-      headers: {
-        Accept: "application/json",
-        method: "GET"
-      }
-    });
-
-    const data = await Promise.resolve(res1.text());
-
-    const header_data = data.split(" ");
-
-    console.log("response", header_data[header_data.length - 1]);
-
-    this.props.setNotification(
-      header_data,
-      header_data[header_data.length - 1]
-    );
+      fetch(`http://localhost/index.php?data=${postdata}`, {
+        headers: {
+          Accept: "application/json",
+          method: "GET"
+        }
+      })
+        .then(res => res.json())
+        .then(data => this.props.setNotification(data));
+    }
   };
 
   render() {
@@ -57,7 +51,9 @@ class DataInputPane extends Component {
               name="firstname"
               placeholder="Your name.."
               onChange={e => {
-                this.setState({ fname: e.target.value });
+                if (e.target.value != "")
+                  this.setState({ fname: e.target.value });
+                else this.setState({ fname: null });
               }}
             />
             <label>Last Name</label>
@@ -67,7 +63,9 @@ class DataInputPane extends Component {
               name="lastname"
               placeholder="Your last name.."
               onChange={e => {
-                this.setState({ lname: e.target.value });
+                if (e.target.value != "")
+                  this.setState({ lname: e.target.value });
+                else this.setState({ lname: null });
               }}
             />
 
@@ -78,7 +76,9 @@ class DataInputPane extends Component {
               name="email"
               placeholder="Your email"
               onChange={e => {
-                this.setState({ email: e.target.value });
+                if (e.target.value != "")
+                  this.setState({ email: e.target.value });
+                else this.setState({ email: null });
               }}
             />
 
@@ -88,7 +88,9 @@ class DataInputPane extends Component {
               name="subject"
               placeholder="Write something.."
               onChange={e => {
-                this.setState({ message: e.target.value });
+                if (e.target.value != "")
+                  this.setState({ message: e.target.value });
+                else this.setState({ message: null });
               }}
             ></textarea>
 

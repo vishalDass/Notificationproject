@@ -1,23 +1,70 @@
 import React, { Component } from "react";
+import {
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
+} from "reactstrap";
 
 class AppHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      notCount: this.props.setHeaderData,
-      notificationMenu: this.props.setHeaderData
+      notCount: null,
+      notificationMenu: this.props.setHeaderData,
+      isOpen: false,
+      isMenuInitialized: false
     };
   }
 
-  notificationsChecked = event => {
+  componentDidMount() {
+    const res = fetch("http://localhost/fetch.php", {
+      headers: {
+        Accept: "application/json",
+        method: "GET"
+      }
+    })
+      .then(res => res.json())
+      .then(notif => this.props.onPageLoad(notif));
+  }
+
+  notificationsChecked = async () => {
+    const res = await fetch("http://localhost/update.php", {
+      headers: {
+        Accept: "application/json",
+        method: "GET"
+      }
+    });
+
+    const menuData = await res.json();
+
     this.props.onCheckNotifications();
-    console.log("function call");
+
+    console.log("menu data", menuData);
+    this.setState({
+      isMenuInitialized: true,
+      notificationMenu: menuData
+    });
+  };
+
+  toggle = () => {
+    this.setState({ isOpen: !this.state.isOpen });
+    this.notificationsChecked();
   };
 
   render() {
     const styling = {
       position: "relative; top: 3px"
     };
+    console.log("menu state", this.state.notificationMenu);
+    let dropdownMenu;
+    if (this.state.isMenuInitialized) {
+      console.log("menu state", this.state.notificationMenu);
+      dropdownMenu = this.state.notificationMenu.map(item => (
+        <DropdownItem>{item.name}</DropdownItem>
+      ));
+    }
+
     return (
       <header classNameName="site-navbar py-2 bg-blue" role="banner">
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -80,8 +127,35 @@ class AppHeader extends Component {
               </li>
             </ul>
             <ul className="nav navbar-nav navbar-right">
-              <li className="dropdown">
-                <a
+              {}
+              <Dropdown isOpen={this.state.isOpen} toggle={this.toggle}>
+                <DropdownToggle caret>
+                  {" "}
+                  <span
+                    className="label label-pill label-danger count"
+                    style={{ borderRadius: "10px" }}
+                    toggle={this.toggle}
+                  >
+                    {this.props.setHeaderData}
+                  </span>{" "}
+                  <span
+                    className="glyphicon glyphicon-bell"
+                    style={{ fontSize: "18px" }}
+                  ></span>
+                </DropdownToggle>
+                <DropdownMenu>
+                  {dropdownMenu}
+
+                  {/* <DropdownItem>Some Action</DropdownItem>
+                  <DropdownItem disabled>Action (disabled)</DropdownItem>
+                  <DropdownItem divider />
+                  <DropdownItem>Foo Action</DropdownItem>
+                  <DropdownItem>Bar Action</DropdownItem>
+                  <DropdownItem>Quo Action</DropdownItem> */}
+                </DropdownMenu>
+              </Dropdown>
+              {/* <a
+                  data-toogle="dropdown"
                   className="dropdown-toggle"
                   aria-expanded="false"
                   onClick={this.notificationsChecked}
@@ -148,7 +222,7 @@ class AppHeader extends Component {
                     </a>
                   </li>
                 </ul>
-              </li>
+              </li> */}
             </ul>
           </div>
         </nav>

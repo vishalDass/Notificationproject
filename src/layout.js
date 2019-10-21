@@ -5,13 +5,17 @@ import DataInputPane from "./dataInputPane";
 class Layout extends Component {
   state = { data: [], notifications: null };
 
-  handleData = (menuData, notCount) => {
-    this.setState({ menu: menuData, notifications: notCount });
+  handleData = notCount => {
+    this.setState({ notifications: notCount });
   };
 
   notificationsChecked = () => {
     this.setState({ notifications: "" });
     console.log("this is parent");
+  };
+
+  handlepageLoadData = data => {
+    this.setState({ notifications: data.count });
   };
 
   componentWillMount() {
@@ -20,9 +24,7 @@ class Layout extends Component {
         Accept: "application/json",
         method: "GET"
       }
-    }); //.then(res => console.log("response", res.json())); //this.setState({ value: rslt, menu:  }));
-
-    //   var num = parseInt(rslt);
+    });
   }
 
   render() {
@@ -31,6 +33,7 @@ class Layout extends Component {
         <Header
           setHeaderData={this.state.notifications}
           onCheckNotifications={this.notificationsChecked}
+          onPageLoad={this.handlepageLoadData}
         />
         <DataInputPane setNotification={this.handleData} />
       </div>
